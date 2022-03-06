@@ -1,6 +1,6 @@
 #Ariel Tynan
 #Euler Problem 054, Poker hands, solved in Python
-#Started 6 March 2022
+#Started and completed 6 March 2022
 
 def create_Card(val,suit):
     newCard = [val,suit]
