@@ -2,19 +2,23 @@
 #Euler Problem 054, Poker hands, solved in Python
 #Started and completed 6 March 2022
 
-def create_Card(val,suit):
+#Creates cards and writes in values
+def create_Card(val,suit): 
     newCard = [val,suit]
     return newCard
 
-def build_Hand(hand,card):
+#Inserts cards into hands
+def build_Hand(hand,card): 
     hand.append(card)
     return hand
 
-def stack_Hands(stack,hand):
+#Stores all hands into each player's stack
+def stack_Hands(stack,hand): 
     stack.append(hand)
     return stack
 
-def convert_Nums(card):
+#Converts string face card values into corresponding ints, used for scoring
+def convert_Nums(card): 
     if card[0] == 'T':
         card[0] = 10
     elif card[0] == 'J':
@@ -27,6 +31,7 @@ def convert_Nums(card):
         card[0] = 14
     return card
 
+#Finds duplicate card values in each hand, as well as flushes
 def find_Dups(hand): #fuction heavily modified from Geeks for geeks
     dups = []
     flat = [item for sublist in hand for item in sublist]
@@ -51,9 +56,10 @@ def find_Dups(hand): #fuction heavily modified from Geeks for geeks
     return(dups) #dups = [amount,value]
 
 def score_Hand(hand):
+
+    ## INITIALIZING  ##
     #Score made up of 9 hand bytes
     score = [0,0,0,0,0,0,0,0,0,0] #hand score init
-
     flush = False #Flush
     straight = False #Straight
     pair1 = False #One pair
@@ -65,47 +71,38 @@ def score_Hand(hand):
     RF = False #Royal Flush\
     highCards = []
 
+    ## HAND TIER CHECKS ##
+
     #flush check
     if hand[0][1] == hand[1][1] == hand[2][1] == hand[3][1] == hand[4][1]: #all cards, same suite
         flush = True
-        #print("There is a FLUSH!")
 
     #straight check
     cards = ['A','2','3','4','5','6','7','8','9','T','J','Q','K','A']
-    #print(find_Dups(hand))
     for i in range(0,5):
         while str(hand[i][0]) in cards: #Accounts for duplicates, while loops accounts for Aces
             cards[cards.index(str(hand[i][0]))] = 0
-    #print(cards)
     for i in range(len(cards)-4):
         if cards[i] == cards[i + 1] == cards[i + 2] == cards[i + 3] == cards[i + 4] == 0:
             straight = True
-            #print("There is a straight!")
 
     #Find high cards
     for i in range(13,0,-1): #J = 11, Q = 12, K = 13, A = 14
         if cards[i] == 0:
             highCards.append(i+1) #order of cards highest to lowest, based on index
-    #Convert highcard face cards to numbers
     
-    #Check dups
+    #Check dupicatess
     dups = find_Dups(hand)
     for i in range(len(dups)):
-        if dups[i][1] == 2 and pair1 == False:
-            #print("There is a pair")
+        if dups[i][1] == 2 and pair1 == False: #one pair
             pair1 = True
-        elif dups[i][1] == 3 and pair1 == False:
-            #print("Three of a kind")
+        elif dups[i][1] == 3 and pair1 == False: #trips
             trips = True
-        elif dups[i][1] == 2 and pair1 == True:
-            #print("There are two pairs")
+        elif dups[i][1] == 2 and pair1 == True: #two pair
             pair2 = True
-            #pair1 = False
-        elif dups[i][1] == 2 and pair1 == True:
-            #print("Full House")
+        elif dups[i][1] == 3 and pair1 == True: #full house
             FH = True
-            #trips = False
-        elif dups[i][1] == 4:
+        elif dups[i][1] == 4: #quads
             quads = True
 
     #Convert dup face values to numbers
@@ -125,35 +122,26 @@ def score_Hand(hand):
     elif straight == True and flush == True:
         SF = True 
         score[1] = highCard[0] #straight is worth highest card
-        #Find top card in straight
         print("STRAIGHT FLUSH", cardList[highCards[0]-1], "high")
     elif quads == True:
         score[2] = 10000*dups[0][0] + 100*highCards[0] + highCards[1] #only two valid HC spots 
-        #Store value in dups
-        #FIND KICKER
         print("FOUR OF A KIND,", cardList[int(dups[0][0])-1])#, ", with", cardList[highCards[0]-1], "kicker.")
     elif FH == True:
-        #Store values in dups for trips and pair
         score[3] = 100*dups[1][0] + dups[0][0] #trips, pair
         print("FULL HOUSE",cardList[int(dups[1][0])-1],"full of", cardList[int(dups[0][0])-1])
     elif flush == True:
-        #Order cards in flush
         score[4] = highCards[0] #flush is worth highest card
         print("Flush", cardList[highCards[0]-1], "high")
     elif straight == True:
-        #Find op card in straight
         score[5] = highCards[0] #straight is worth highest card
         print("Straight", cardList[highCards[0]-1], "high.")
     elif trips == True:
-        #Store value in dups
         score[6] = 1000000*int(dups[0][0]) + 10000*highCards[0] + 100*highCards[1] #+ highCards[2] #three HCs
         print("Three of a kind,", cardList[int(dups[0][0])-1])#, ", with", cardList[highCards[0]-1], "kicker.") 
     elif pair2 == True:
-        #Store values of pairs in dups
         score[7] = 100000000*int(dups[1][0]) + 1000000*int(dups[0][0]) + 10000*highCards[0] + 100*highCards[1] + highCards[2] #three HCs
         print("Two pair,",cardList[int(dups[1][0])-1],"and", cardList[int(dups[0][0])-1])#, ", with", cardList[highCards[0]-1], "kicker.")
     elif pair1 == True:
-        #Store value of pair in dups
         score[8] = 100000000*int(dups[0][0]) + 1000000*int(highCards[0]) + 10000*highCards[1] + 100*highCards[2] + highCards[3]#four HCs
         print("A pair of", cardList[int(dups[0][0])-1])#, ", with", cardList[highCards[0]-1], "kicker.")
     else:
@@ -188,7 +176,7 @@ for i in range(0,n,10):
         stack_Hands(p2All,hand)
 
 #p1All[hand][card][val/suit]
-#Find value of each hand
+
 p1Wins = 0
 for i in range(0,1000,1): #1000 pairs of hands
     print("\n","Hand: ",i+1)
@@ -200,16 +188,3 @@ for i in range(0,1000,1): #1000 pairs of hands
     else:
         print("Player 2 wins")
 print("\n","Total Player 1 Wins: ", p1Wins)
-
-
-
-
-
-    #Poker scoring
-
-    #Tier one: Main hand (one byte)
-        #RF,SF,4oaK,FH,F,S,ToaK,TP,OP,HC
-        #10,9,8,7,6,5,4,3,2,1 
-    #Tier two: Main hand val (one byte)
-        #A,K,Q,J,T,9,8,7,6,5,4,3,2
-    #Tier three: HC val (five bytes)
